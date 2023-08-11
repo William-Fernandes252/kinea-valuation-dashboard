@@ -1,0 +1,4 @@
+- separar campo indicadores;
+- adicionar campos fundo e projeto;
+- criar tabela com dados dos prints;
+- incluir botão, embaixo da tabela, para exportar a tabela para um excel;
