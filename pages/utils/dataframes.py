@@ -5,9 +5,17 @@ import pandas as pd
 from controller import versoes
 
 
+def _set_versoes_df_column_names(versoes_df: pd.DataFrame) -> pd.DataFrame:
+    versoes_df.rename(columns=versoes.MAP_VERSAO_LABEL_FIELD, inplace=True)
+    return versoes_df
+
+
 def versoes_df_from_records(
     versoes_records: list[dict], indicadores: list[str] | Literal["all"]
 ) -> pd.DataFrame | None:
+    if not isinstance(indicadores, list) or indicadores != "all":
+        raise ValueError("Indicadores inválidos.")
+
     if len(versoes_records) < 1:
         return None
 
@@ -18,7 +26,9 @@ def versoes_df_from_records(
             for field in versoes.MAP_VERSAO_LABEL_FIELD.keys()
             if field not in indicadores
         )
-    return pd.DataFrame.from_records(
-        versoes_records,
-        exclude=campos_para_excluir,
+    return _set_versoes_df_column_names(
+        pd.DataFrame.from_records(
+            versoes_records,
+            exclude=campos_para_excluir,
+        )
     )

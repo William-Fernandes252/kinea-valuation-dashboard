@@ -138,11 +138,15 @@ if get_mostrar_resultados():
 
     with main:
         if get_mostrar_versoes():
-            resultado_versoes_df = dataframes.versoes_df_from_records(
-                versoes_selecionadas,
-                indicadores if "Todos" not in indicadores else "all",
-            )
-            if resultado_versoes_df is not None:
-                main.dataframe(resultado_versoes_df)
+            try:
+                resultado_versoes_df = dataframes.versoes_df_from_records(
+                    versoes_selecionadas,
+                    indicadores if "Todos" not in indicadores else "all",
+                )
+            except ValueError as e:
+                main.error(str(e))
             else:
-                main.warning("Base vazia.")
+                if resultado_versoes_df is not None:
+                    main.dataframe(resultado_versoes_df)
+                else:
+                    main.warning("Base vazia.")
