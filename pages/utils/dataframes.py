@@ -1,3 +1,4 @@
+import tempfile
 from typing import Literal
 
 import pandas as pd
@@ -13,7 +14,7 @@ def _set_versoes_df_column_names(versoes_df: pd.DataFrame) -> pd.DataFrame:
 def versoes_df_from_records(
     versoes_records: list[dict], indicadores: list[str] | Literal["all"]
 ) -> pd.DataFrame | None:
-    if not isinstance(indicadores, list) or indicadores != "all":
+    if not isinstance(indicadores, list) and indicadores != "all":
         raise ValueError("Indicadores inválidos.")
 
     if len(versoes_records) < 1:
@@ -32,3 +33,9 @@ def versoes_df_from_records(
             exclude=campos_para_excluir,
         )
     )
+
+
+def versoes_df_to_excel(versoes_df: pd.DataFrame):
+    _, nome_arquivo = tempfile.mkstemp(".xlsx")
+    versoes_df.to_excel(nome_arquivo, index=False)
+    return nome_arquivo
