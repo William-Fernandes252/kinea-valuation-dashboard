@@ -144,9 +144,15 @@ if get_mostrar_resultados():
                     indicadores if "Todos" not in indicadores else "all",
                 )
             except ValueError as e:
-                main.error(str(e))
+                versoes_config_form.error(str(e))
             else:
                 if resultado_versoes_df is not None:
                     main.dataframe(resultado_versoes_df)
+                    with open(
+                        dataframes.versoes_df_to_excel(resultado_versoes_df), "rb"
+                    ) as versoes_excel:
+                        main.download_button(
+                            "Baixar análise", versoes_excel, "versoes.xlsx"
+                        )
                 else:
                     main.warning("Base vazia.")
