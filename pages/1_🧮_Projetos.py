@@ -34,7 +34,9 @@ with projeto_tab:
     ].reset_index(drop=True)
 
     col_data_premissa, col_versao = st.columns(2)
-    data_premissa = col_data_premissa.date_input("Data de referência")
+    data_premissa = col_data_premissa.date_input(
+        "Data de referência", format="DD/MM/YYYY"
+    )
     versao = col_versao.text_input("Nome da versão")
 
     datas_expander = st.expander("Projeto", expanded=False)
@@ -45,22 +47,28 @@ with projeto_tab:
             data_lancamento = colunas_dt[0].date_input(
                 "Lançamento",
                 value=df_projeto["Data_de_Lancamento__c"][0],
+                format="DD/MM/YYYY",
             )
             data_ini_obra = colunas_dt[0].date_input(
                 "Inicio das obras",
                 value=df_projeto["Inicio_das_obras__c"][0],
+                format="DD/MM/YYYY",
             )
             data_base_reajuste = colunas_dt[0].date_input(
                 "Base reajuste",
                 value=df_projeto["Data_de_referencia_viabilidade__c"][0],
+                format="DD/MM/YYYY",
             )
         with colunas_dt[1]:
             data_entrega = colunas_dt[1].date_input(
-                "Entrega", value=df_projeto["Habitese__c"][0]
+                "Entrega",
+                value=df_projeto["Habitese__c"][0],
+                format="DD/MM/YYYY",
             )
             data_termino = colunas_dt[1].date_input(
                 "Termino",
                 value=df_projeto["Data_de_Termino__c"][0],
+                format="DD/MM/YYYY",
             )
             perc_permuta = colunas_dt[1].number_input(
                 "% Permuta", min_value=0.0, value=df_projeto["Perc_Permuta__c"][0]
@@ -295,6 +303,7 @@ with despesas_tab:
                 dist_data_inicio = st.date_input(
                     "Inicio pagamento distrato",
                     value=df_premissa_sql["dist_data_inicio"][0],
+                    format="DD/MM/YYYY",
                 )
                 dist_meses = st.number_input(
                     "Quantidade de parcelas",
