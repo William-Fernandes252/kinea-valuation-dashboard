@@ -11,91 +11,94 @@ config.set_page_settings(st)
 
 st.header("🧮 Projetos")
 
-col_projeto, col_clona_versao = st.columns(2)
-# ? Nome do projeto cadastrado no salesforce
-df_projeto = sfc.SFToDF_projeto()
-option_proj = col_projeto.selectbox("Projeto:", df_projeto["Name"])
-selected_id = df_projeto.loc[df_projeto["Name"] == option_proj, "Id"].iloc[0]
-df_projeto = df_projeto[df_projeto["Id"] == selected_id].reset_index(drop=True)
-# conteiner.write('O Id do nome selecionado é:', selected_id)
-
-# ? Pega as versões cadastradas
-df_premissa_sql = fluxo.v.sql.select_premissa()
-option_versao = col_clona_versao.selectbox(
-    "Clonar de:", df_premissa_sql["chave_premissa"]
+projeto_tab, velocidade_vendas_tab, despesas_tab, cashsweep_tab = st.tabs(
+    ["Início", "Velocidade de vendas", "Despesas", "Cashsweep"]
 )
-selected_id_premissa = df_premissa_sql.loc[
-    df_premissa_sql["chave_premissa"] == option_versao, "id_premissa"
-].iloc[0]
-df_premissa_sql = df_premissa_sql[
-    df_premissa_sql["id_premissa"] == selected_id_premissa
-].reset_index(drop=True)
+with projeto_tab:
+    col_projeto, col_clona_versao = st.columns(2)
 
-col_data_premissa, col_versao = st.columns(2)
-data_premissa = col_data_premissa.date_input("Data de referência")
-versao = col_versao.text_input("Nome da versão")
+    df_projeto = sfc.SFToDF_projeto()
+    option_proj = col_projeto.selectbox("Projeto:", df_projeto["Name"])
+    selected_id = df_projeto.loc[df_projeto["Name"] == option_proj, "Id"].iloc[0]
+    df_projeto = df_projeto[df_projeto["Id"] == selected_id].reset_index(drop=True)
 
-datas_expander = st.expander("Projeto", expanded=False)
-with datas_expander:
-    colunas_dt = st.columns([1, 1])
+    df_premissa_sql = fluxo.v.sql.select_premissa()
+    option_versao = col_clona_versao.selectbox(
+        "Clonar de:", df_premissa_sql["chave_premissa"]
+    )
+    selected_id_premissa = df_premissa_sql.loc[
+        df_premissa_sql["chave_premissa"] == option_versao, "id_premissa"
+    ].iloc[0]
+    df_premissa_sql = df_premissa_sql[
+        df_premissa_sql["id_premissa"] == selected_id_premissa
+    ].reset_index(drop=True)
 
-    with colunas_dt[0]:
-        data_lancamento = st.date_input(
-            "Lançamento",
-            value=df_projeto["Data_de_Lancamento__c"][0],
-        )
-        data_ini_obra = st.date_input(
-            "Inicio das obras",
-            value=df_projeto["Inicio_das_obras__c"][0],
-        )
-        data_base_reajuste = st.date_input(
-            "Base reajuste",
-            value=df_projeto["Data_de_referencia_viabilidade__c"][0],
-        )
-    with colunas_dt[1]:
-        data_entrega = st.date_input("Entrega", value=df_projeto["Habitese__c"][0])
-        data_termino = st.date_input(
-            "Termino",
-            value=df_projeto["Data_de_Termino__c"][0],
-        )
-        perc_permuta = st.number_input(
-            "% Permuta", min_value=0.0, value=df_projeto["Perc_Permuta__c"][0]
-        )
+    col_data_premissa, col_versao = st.columns(2)
+    data_premissa = col_data_premissa.date_input("Data de referência")
+    versao = col_versao.text_input("Nome da versão")
 
-velocidade_vendas = st.columns([1])
-with velocidade_vendas[0]:
+    datas_expander = st.expander("Projeto", expanded=False)
+    with datas_expander:
+        colunas_dt = st.columns([1, 1])
+
+        with colunas_dt[0]:
+            data_lancamento = colunas_dt[0].date_input(
+                "Lançamento",
+                value=df_projeto["Data_de_Lancamento__c"][0],
+            )
+            data_ini_obra = colunas_dt[0].date_input(
+                "Inicio das obras",
+                value=df_projeto["Inicio_das_obras__c"][0],
+            )
+            data_base_reajuste = colunas_dt[0].date_input(
+                "Base reajuste",
+                value=df_projeto["Data_de_referencia_viabilidade__c"][0],
+            )
+        with colunas_dt[1]:
+            data_entrega = colunas_dt[1].date_input(
+                "Entrega", value=df_projeto["Habitese__c"][0]
+            )
+            data_termino = colunas_dt[1].date_input(
+                "Termino",
+                value=df_projeto["Data_de_Termino__c"][0],
+            )
+            perc_permuta = colunas_dt[1].number_input(
+                "% Permuta", min_value=0.0, value=df_projeto["Perc_Permuta__c"][0]
+            )
+
+with velocidade_vendas_tab:
     st.markdown("**Velocidade de Vendas**")
 
     prechaves_expander = st.expander("Pre-chaves", expanded=False)
     with prechaves_expander:
         colunas_prechaves = st.columns([1, 1, 1])
         with colunas_prechaves[0]:
-            pre_ch_ato = st.number_input(
+            pre_ch_ato = colunas_prechaves[0].number_input(
                 "% Ato", min_value=0.0, value=df_premissa_sql["pre_ch_ato"][0]
             )
-            pre_ch_periodo_repasse = st.number_input(
+            pre_ch_periodo_repasse = colunas_prechaves[0].number_input(
                 "Periodo repasse",
                 min_value=0,
                 value=int(df_premissa_sql["pre_ch_periodo_repasse"][0]),
             )
         with colunas_prechaves[1]:
-            pre_ch_mensais = st.number_input(
+            pre_ch_mensais = colunas_prechaves[1].number_input(
                 "% Mensais",
                 min_value=0.0,
                 value=df_premissa_sql["pre_ch_mensais"][0],
             )
-            pre_ch_carencia_repasse = st.number_input(
+            pre_ch_carencia_repasse = colunas_prechaves[1].number_input(
                 "Carência repasse",
                 min_value=0,
                 value=(int(df_premissa_sql["pre_ch_carencia_repasse"][0])),
             )
         with colunas_prechaves[2]:
-            pre_ch_repasse = st.number_input(
+            pre_ch_repasse = colunas_prechaves[2].number_input(
                 "% Repasse",
                 min_value=0.0,
                 value=df_premissa_sql["pre_ch_repasse"][0],
             )
-            pre_ch_carencia = st.number_input(
+            pre_ch_carencia = colunas_prechaves[2].number_input(
                 "Carência",
                 min_value=0,
                 value=df_premissa_sql["pre_ch_carencia"][0],
@@ -249,77 +252,79 @@ with velocidade_vendas[0]:
             st.dataframe(df_ajuste)
             st.dataframe(resumo_vendasAno)
 
-despesas = st.columns([1])
-with despesas[0]:
-    st.markdown("**Despesas**")
-    inad_expander = st.expander("Inadimplência", expanded=False)
-    with inad_expander:
-        colunas_inadimplencia = st.columns([1, 1])
-        with colunas_inadimplencia[0]:
-            inad_curva_projetada = st.number_input(
-                "Curva projetada",
-                min_value=1,
-                help="Em quantas parcelas mensais recebera a inadimplencia",
-                value=df_premissa_sql["inad_curva_projetada"][0],
-            )
-        with colunas_inadimplencia[1]:
-            inad_pdd = st.number_input(
-                "% PDD",
-                min_value=0.0,
-                max_value=100.0,
-                help="Percentual de perda da inadimplência",
-                value=df_premissa_sql["inad_pdd"][0],
-            )
+with despesas_tab:
+    despesas = st.columns([1])
+    with despesas[0]:
+        st.markdown("**Despesas**")
+        inad_expander = st.expander("Inadimplência", expanded=False)
+        with inad_expander:
+            colunas_inadimplencia = st.columns([1, 1])
+            with colunas_inadimplencia[0]:
+                inad_curva_projetada = st.number_input(
+                    "Curva projetada",
+                    min_value=1,
+                    help="Em quantas parcelas mensais recebera a inadimplencia",
+                    value=df_premissa_sql["inad_curva_projetada"][0],
+                )
+            with colunas_inadimplencia[1]:
+                inad_pdd = st.number_input(
+                    "% PDD",
+                    min_value=0.0,
+                    max_value=100.0,
+                    help="Percentual de perda da inadimplência",
+                    value=df_premissa_sql["inad_pdd"][0],
+                )
 
-    distratos_expander = st.expander("Distratos", expanded=False)
-    with distratos_expander:
-        colunas_distratos = st.columns([1, 1])
-        with colunas_distratos[0]:
-            dist_unidades = st.number_input(
-                "Unidades distratadas",
-                min_value=0,
-                help="Projeção de quantas unidades serão distratadas",
-                value=df_premissa_sql["dist_unidades"][0],
-            )
-            dist_perc_devolucao = st.number_input(
-                "% Devolução",
-                min_value=0.0,
-                help="Projeção do valor a ser devolvido por distrato",
-                value=df_premissa_sql["dist_perc_devolucao"][0],
-            )
-        with colunas_distratos[1]:
-            dist_data_inicio = st.date_input(
-                "Inicio pagamento distrato",
-                value=df_premissa_sql["dist_data_inicio"][0],
-            )
-            dist_meses = st.number_input(
-                "Quantidade de parcelas",
-                min_value=0,
-                help="Quantidade de parcelas mensais a serem pagos os distratos",
-                value=df_premissa_sql["dist_meses"][0],
-            )
-    outras_despesas = st.number_input(
-        "% Outras despesas",
-        min_value=0.0,
-        max_value=100.0,
-        help="percentual dos recebiveis no mês que serao considerados como despesas",
-        value=df_premissa_sql["outras_despesas"][0],
-    )
-
-st.markdown("**Cashsweep**")
-cashsweep_expander = st.expander("Cashsweep", expanded=False)
-with cashsweep_expander:
-    colunas_cashsweep = st.columns([1, 1])
-    with colunas_cashsweep[0]:
-        fin_carencia = st.number_input(
-            "Carência financiamento",
-            min_value=0,
-            help="Quantidade de meses de carencia para incorporadora pagar o banco",
-            value=df_premissa_sql["fin_carencia"][0],
+        distratos_expander = st.expander("Distratos", expanded=False)
+        with distratos_expander:
+            colunas_distratos = st.columns([1, 1])
+            with colunas_distratos[0]:
+                dist_unidades = st.number_input(
+                    "Unidades distratadas",
+                    min_value=0,
+                    help="Projeção de quantas unidades serão distratadas",
+                    value=df_premissa_sql["dist_unidades"][0],
+                )
+                dist_perc_devolucao = st.number_input(
+                    "% Devolução",
+                    min_value=0.0,
+                    help="Projeção do valor a ser devolvido por distrato",
+                    value=df_premissa_sql["dist_perc_devolucao"][0],
+                )
+            with colunas_distratos[1]:
+                dist_data_inicio = st.date_input(
+                    "Inicio pagamento distrato",
+                    value=df_premissa_sql["dist_data_inicio"][0],
+                )
+                dist_meses = st.number_input(
+                    "Quantidade de parcelas",
+                    min_value=0,
+                    help="Quantidade de parcelas mensais a serem pagos os distratos",
+                    value=df_premissa_sql["dist_meses"][0],
+                )
+        outras_despesas = st.number_input(
+            "% Outras despesas",
+            min_value=0.0,
+            max_value=100.0,
+            help="percentual dos recebiveis no mês que serao considerados como despesas",
+            value=df_premissa_sql["outras_despesas"][0],
         )
-    with colunas_cashsweep[1]:
-        st.write("Cashsweep?")
-        cash_sweep = st.checkbox("")
+
+with cashsweep_tab:
+    st.markdown("**Cashsweep**")
+    cashsweep_expander = st.expander("Cashsweep", expanded=False)
+    with cashsweep_expander:
+        colunas_cashsweep = st.columns([1, 1])
+        with colunas_cashsweep[0]:
+            fin_carencia = st.number_input(
+                "Carência financiamento",
+                min_value=0,
+                help="Quantidade de meses de carencia para incorporadora pagar o banco",
+                value=df_premissa_sql["fin_carencia"][0],
+            )
+        with colunas_cashsweep[1]:
+            st.write("Cashsweep?")
+            cash_sweep = st.checkbox("")
 
 if st.button("Calcular"):
     if versao == "" or versao == None:
