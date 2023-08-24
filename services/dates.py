@@ -1,9 +1,8 @@
 import calendar
 from datetime import datetime
+from typing import Dict, Final
 
-import pytz
-
-MESES = {
+MESES: Final[Dict[int, str]] = {
     1: "Janeiro",
     2: "Fevereiro",
     3: "Março",
