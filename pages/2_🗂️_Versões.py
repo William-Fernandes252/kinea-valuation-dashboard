@@ -1,8 +1,7 @@
-import pandas as pd
 import streamlit as st
 
 from controller import sql_functions, versoes
-from pages.utils import config, dataframes, forms, state
+from pages.utils import config, forms, state
 from services import dates
 
 name = "versoes"
@@ -104,26 +103,25 @@ if get_mostrar_resultados():
             max_selections=2,
             help="Selecione duas versões para comparar.",
         )
+
         indicadores = versoes_config_form.multiselect(
             "Escolher indicadores",
             options=["Todos"]
-            + [
-                field
-                for field in versoes_df.keys()
-                if field in versoes.MAP_VERSAO_LABEL_FIELD
-            ],
-            format_func=lambda indicador: versoes.MAP_VERSAO_LABEL_FIELD[indicador]
+            + [field for field in versoes_df.keys() if field in versoes.fields],
+            format_func=lambda indicador: versoes.get_label(indicador)
             if indicador in versoes_df.keys()
             else indicador,
             help="Selecione os indicadores para visualização.",
         )
+
         if versoes_config_form.form_submit_button(
             label="Aplicar",
             type="primary",
             kwargs={"versoes": versoes_selecionadas, "indicadores": indicadores},
         ):
             resultado = validate_versoes(
-                versoes=versoes_selecionadas, indicadores=indicadores
+                versoes=versoes_selecionadas,
+                indicadores=indicadores,
             )
             if resultado == None:
                 set_mostrar_versoes(True)
@@ -139,17 +137,27 @@ if get_mostrar_resultados():
     with main:
         if get_mostrar_versoes():
             try:
-                resultado_versoes_df = dataframes.versoes_df_from_records(
+                resultado_versoes_df = versoes.get_versoes(
                     versoes_selecionadas,
-                    indicadores if "Todos" not in indicadores else "all",
+                    None
+                    if "Todos" in indicadores
+                    else [key for key in versoes.fields if key not in indicadores],
+                    transpose=True,
                 )
             except ValueError as e:
                 versoes_config_form.error(str(e))
             else:
                 if resultado_versoes_df is not None:
-                    main.dataframe(resultado_versoes_df)
+                    main.dataframe(
+                        resultado_versoes_df,
+                        use_container_width=True,
+                        column_config={
+                            field: {"width": "auto", "alignment": "center"}
+                            for field in versoes.fields
+                        },
+                    )
                     with open(
-                        dataframes.versoes_df_to_excel(resultado_versoes_df), "rb"
+                        versoes.versoes_df_to_excel(resultado_versoes_df), "rb"
                     ) as versoes_excel:
                         main.download_button(
                             "Baixar análise", versoes_excel, "versoes.xlsx"
