@@ -96,5 +96,5 @@ def _set_columns_names(df: pd.DataFrame) -> pd.DataFrame:
 
 def versoes_df_to_excel(versoes_df: pd.DataFrame):
     _, nome_arquivo = tempfile.mkstemp(".xlsx")
-    versoes_df.to_excel(nome_arquivo, index=False)
+    versoes_df.to_excel(nome_arquivo)
     return nome_arquivo
