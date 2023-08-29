@@ -27,7 +27,6 @@ df_projeto = sfc.SFToDF_projeto()
 with projeto_tab:
     col_projeto, col_clona_versao = st.columns(2)
 
-    df_projeto = sfc.SFToDF_projeto()
     option_proj = col_projeto.selectbox("Projeto:", df_projeto["Name"])
     selected_id = df_projeto.loc[df_projeto["Name"] == option_proj, "Id"].iloc[0]
     df_projeto = df_projeto[df_projeto["Id"] == selected_id].reset_index(drop=True)
@@ -185,11 +184,10 @@ with velocidade_vendas_tab:
     with vendas_expander:
         colunas_vendas = st.columns([1, 1])
         with colunas_vendas[0]:
-            venda_perc_desconto = st.number_input(
-                "% Desconto",
+            venda_preco_m2_bruto = st.number_input(
+                "Preço m² Bruto",
                 min_value=0.0,
-                max_value=100.0,
-                value=df_premissa_sql["venda_perc_desconto"][0],
+                value=df_premissa_sql["venda_preco_m2_bruto"][0],
             )
             venda_perc_comissao = st.number_input(
                 "% Comissão",
@@ -198,22 +196,29 @@ with velocidade_vendas_tab:
                 value=df_premissa_sql["venda_perc_comissao"][0],
             )
         with colunas_vendas[1]:
-            venda_preco_m2_bruto = st.number_input(
-                "Preço m² Bruto",
-                min_value=0.0,
-                value=df_premissa_sql["venda_preco_m2_bruto"][0],
+            campo_escolhido = st.radio(
+                "Preço m² Líquido", ("Por valor", "Por desconto"), horizontal=True
             )
-            venda_preco_m2_liquido = st.number_input(
-                "Preço m² Liquido",
-                min_value=0.0,
-                value=df_premissa_sql["venda_preco_m2_liquido"][0],
-            )
-
+            if campo_escolhido == "Por valor":
+                venda_preco_m2_liquido = st.number_input(
+                    "Valor",
+                    min_value=0.0,
+                    value=df_premissa_sql["venda_preco_m2_liquido"][0],
+                )
+                venda_perc_desconto = 1 - venda_preco_m2_liquido / venda_preco_m2_bruto
+            else:
+                venda_perc_desconto = st.number_input(
+                    "% Desconto",
+                    min_value=0.0,
+                    max_value=100.0,
+                    value=df_premissa_sql["venda_perc_desconto"][0],
+                )
+                venda_preco_m2_liquido = venda_preco_m2_bruto * (
+                    1 - venda_perc_desconto
+                )
         bt_curva_vendas = st.button("Visualizar Curva")
         if bt_curva_vendas:
             df = fluxo.v.base_proj_vendas(data_premissa, selected_id)
-            print("selected_id :", selected_id)
-            print("data_premissa :", data_premissa)
             (
                 status_projeto,
                 data_termino_status,
@@ -381,6 +386,7 @@ if st.button("Calcular"):
     # fluxo.fluxo_proj_vendas(df_projeto, data_premissa, data_lancamento, data_ini_obra, data_entrega, data_termino, venda_perc_comissao, venda_preco_m2_bruto, data_base_reajuste, hip_vendas_lancamento, hip_vendas_periodo_obra, hip_vendas_poschave, pos_ch_periodo_recebimento)
     # fluxo.fluxo_tot_recebiveis(con_sf=sf_con, id_projeto=selected_id, data_ref=data_premissa, meses_inad=inad_curva_projetada, pdd=inad_pdd)
 
+    print("selected_id", selected_id)
     df = fluxo.v.base_proj_vendas(data_premissa, selected_id)
     percent = i + 1
     my_bar.progress((percent / total), text=progress_text)
@@ -435,7 +441,6 @@ if st.button("Calcular"):
         hip_vendas_periodo_obra,
         hip_vendas_poschave,
     )
-    print("df_curva\n", df)
     percent = i + 1
     my_bar.progress((percent / total), text=progress_text)
 
