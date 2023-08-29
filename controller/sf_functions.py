@@ -43,12 +43,9 @@ def SFToDF_projeto():
     )
     result = sql_functions.conexao_BD().execute(script).fetchall()
     df = pd.DataFrame(result, index=None)
-    print(df)
     df["Spread"] = df["Spreed__c"].apply(lambda x: x / 100 if (x != None) else None)
     df = df.sort_values(by="Name")
     df = df.reset_index(drop=True)
-    print("salesforce: \n", df)
-    # df.to_excel("Projeto_Real_Estate__c.xlsx", index=False)
     return df
 
 

@@ -22,7 +22,6 @@ def _status_unidades(df_status):
 def base_vendas(data_ref, id_projeto):
     server = sql.conexao_BD()
 
-    print("Data premissa: ", data_ref, "Id_projeto: ", id_projeto)
     df = sql.select_db_sell(server, data_ref, id_projeto)
 
     # ? Garantindo que está tudo com dia 1 do mês
@@ -41,8 +40,6 @@ def base_vendas(data_ref, id_projeto):
 
     df_inad = df[df["Data_Vencimento"] <= data_ref].reset_index(drop=True)
     df_inad = df_inad.groupby(["Id_Projeto"], as_index=False)["Saldo_Pagar"].sum()
-
-    print("df base vendas: ", df)
 
     return df_vendido, df_saldo, df_inad
 
@@ -535,8 +532,6 @@ def curvaVendas(
         pos_ch_periodo_recebimento,
     )
 
-    print("vgv_disponivel: ", vgv_disponivel)
-
     df_curva = pd.merge(
         df_ajuste[["Data Ref", "Ajuste"]],
         df_receb_parcelas,
@@ -629,7 +624,7 @@ def calculaPercentualReajuste(data_base_reajuste, data_ref):
     valor_ini = df.iloc[0]["Valor"]
     valor_fim = df.iloc[-1]["Valor"]
     perc_reajuste = (valor_fim / valor_ini) - 1
-    print("# Percentual de reajuste: ", perc_reajuste)
+
     return perc_reajuste
 
 
@@ -800,8 +795,6 @@ def curvaCri(df_fluxo, df_juros_amort_middle, data_ref, indexador, taxa_spread):
     ]
 
     df_curva_cri.to_excel("df_curva_cri.xlsx", index=False)
-    print("df_curva_cri: \n", df_curva_cri)
-    # sql.insert_df_sql('SQNDSC005','incorp_val_curvas_cri', df_curva_cri)
 
     return df_indice_total
 

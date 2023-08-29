@@ -28,9 +28,6 @@ def fluxo_proj_vendas(
     perc_reajuste = v.calculaPercentualReajuste(data_base_reajuste, data_ref)
     rs_m2_viabilidade_atualizado = rs_m2_viabilidade * (1 + perc_reajuste)
 
-    print("perc_reajuste :", perc_reajuste)
-    print("rs_m2_viabilidade_atualizado :", rs_m2_viabilidade_atualizado)
-
     df["perc_venda_desconto"] = 0
     rs_valuation_liquido = rs_m2_viabilidade_atualizado
     if precom2_bruto > 0:
@@ -43,8 +40,6 @@ def fluxo_proj_vendas(
         rs_valuation_liquido = (
             1 - (venda_perc_desconto / 100)
         ) * rs_valuation_liquido  # tem que considerar o desconto tbm
-
-    print("rs_valuation_liquido :", rs_valuation_liquido)
 
     df["rs_m2_viabilidade_atualizado"] = rs_valuation_liquido
     df["rs_m2_venda"] = df["rs_m2_viabilidade_atualizado"] * df["Area"]
@@ -70,7 +65,6 @@ def fluxo_tot_recebiveis(
     df_fluxo = pd.concat([df_vendido, df_saldo])
 
     if not df_inad.empty:
-        print("Meses Inadimplencia: ", meses_inad, "PDD: ", pdd)
         df_inad["Saldo"] = (df_inad["Saldo_Pagar"].iloc[0] / meses_inad) * (1 - pdd)
         datas = [data_ref + relativedelta(months=i + 1) for i in range(meses_inad)]
 
@@ -80,8 +74,6 @@ def fluxo_tot_recebiveis(
         df_inad["dt_mes"] = datas
     else:
         df_inad["dt_mes"] = None
-
-    print("df_inad: \n", df_inad)
 
     df_inad.rename(columns={"Saldo": "proj_inadimplencia"}, inplace=True)
     df_inad = df_inad[["Id_Projeto", "dt_mes", "proj_inadimplencia"]]
@@ -165,7 +157,6 @@ def fluxo_distribuicao_teorica(
         df_fluxo["distribuicao_efetiva_projeto"] + df_fluxo["sf_aportes"]
     )
 
-    print("df_fluxo: \n", df_fluxo)
     df_curva_cri = v.curvaCri(
         df_fluxo, df_juros_amort_middle, data_ref, indexador, taxa_spread
     )
