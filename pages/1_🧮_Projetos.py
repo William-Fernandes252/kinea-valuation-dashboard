@@ -6,14 +6,24 @@ import controller.alertas as alerta
 import controller.sf_functions as sfc
 from model import fluxo
 from pages.utils import config
+from services import dates
 
 config.set_page_settings(st)
 
 st.header("🧮 Projetos")
 
-projeto_tab, velocidade_vendas_tab, despesas_tab, cashsweep_tab = st.tabs(
-    ["Início", "Velocidade de vendas", "Despesas", "Cashsweep"]
+(
+    projeto_tab,
+    velocidade_vendas_tab,
+    despesas_tab,
+    cashsweep_tab,
+    datas_salesforce_tab,
+) = st.tabs(
+    ["Início", "Velocidade de vendas", "Despesas", "Cashsweep", "Datas Salesforce"]
 )
+
+df_projeto = sfc.SFToDF_projeto()
+
 with projeto_tab:
     col_projeto, col_clona_versao = st.columns(2)
 
@@ -334,6 +344,25 @@ with cashsweep_tab:
         with colunas_cashsweep[1]:
             st.write("Cashsweep?")
             cash_sweep = st.checkbox("")
+
+with datas_salesforce_tab:
+    st.markdown("**Datas no Salesforce**")
+    projeto = df_projeto.to_dict("records")[0]
+
+    def display_date(label: str, date: dates.datetime):
+        st.markdown(f"{label}:")
+        st.text(date.strftime("%d/%m/%Y"))
+
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        display_date("Lançamento", projeto["Data_de_Lancamento__c"])
+        display_date("Término", projeto["Data_de_Termino__c"])
+    with col2:
+        display_date(
+            "Referência da viabilidade", projeto["Data_de_referencia_viabilidade__c"]
+        )
+        display_date("Início das obras", projeto["Inicio_das_obras__c"])
+
 
 if st.button("Calcular"):
     if versao == "" or versao == None:
