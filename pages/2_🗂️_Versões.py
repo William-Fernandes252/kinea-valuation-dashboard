@@ -1,7 +1,8 @@
 import streamlit as st
 
 from controller import sql_functions, versoes
-from pages.utils import config, forms, state
+from pages.components import projeto_form
+from pages.utils import config, state
 from services import dates
 
 name = "versoes"
@@ -16,45 +17,13 @@ get_mostrar_resultados, set_mostrar_resultados = use_state("mostrar_resultados",
 st.header("🗂️ Versões")
 
 
-projeto_form = st.form("project-form")
-(
-    projeto_form_col1,
-    projeto_form_col2,
-    projeto_form_col3,
-    projeto_form_col4,
-) = projeto_form.columns(4)
-
-fundo = projeto_form_col1.selectbox(
-    "fundo",
-    options=forms.get_nullable_options(["Todos"]),
-    help="Fundo de investimentos.",
-)
-incorporadora = projeto_form_col2.selectbox(
-    "Incorporadora", options=forms.get_nullable_options(["Seleções múltiplas"])
-)
-tipo_projeto = projeto_form_col3.selectbox(
-    "Tipo de projeto", options=forms.get_nullable_options(["Todos"])
-)
-projeto = projeto_form_col4.selectbox(
-    "Projeto", options=forms.get_nullable_options([1, 2, 3])
-)
-
-
-def validar_projeto_form(*, tipo_projeto, incorporadora, fundo, projeto) -> str | None:
-    if forms.NULL_OPTION in [tipo_projeto, incorporadora, fundo, projeto]:
-        return "Preencha todos os campos para obter os resultados."
-    return None
-
-
-if projeto_form.form_submit_button(
-    label="Aplicar",
-    type="primary",
-):
-    resultado = validar_projeto_form(
-        tipo_projeto=tipo_projeto,
-        incorporadora=incorporadora,
-        fundo=fundo,
-        projeto=projeto,
+projeto_form_component = projeto_form.ProjetoForm.render(st)
+if projeto_form_component.submitted:
+    resultado = projeto_form_component.validator(
+        tipo_projeto=projeto_form_component.tipo_projeto,
+        incorporadora=projeto_form_component.incorporadora,
+        fundo=projeto_form_component.fundo,
+        projeto=projeto_form_component.projeto,
     )
     if resultado == None:
         set_mostrar_resultados(True)
@@ -62,11 +31,11 @@ if projeto_form.form_submit_button(
     else:
         st.error(resultado)
 elif (
-    validar_projeto_form(
-        tipo_projeto=tipo_projeto,
-        incorporadora=incorporadora,
-        fundo=fundo,
-        projeto=projeto,
+    projeto_form_component.validator(
+        tipo_projeto=projeto_form_component.tipo_projeto,
+        incorporadora=projeto_form_component.incorporadora,
+        fundo=projeto_form_component.fundo,
+        projeto=projeto_form_component.projeto,
     )
     is not None
 ):
