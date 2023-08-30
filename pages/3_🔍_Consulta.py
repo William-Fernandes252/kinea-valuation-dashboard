@@ -1,9 +1,7 @@
 import streamlit as st
 
-from controller import sql_functions, versoes
 from pages.components import projeto_form
-from pages.utils import config, forms, state
-from services import dates
+from pages.utils import config, state
 
 name = "versoes"
 
