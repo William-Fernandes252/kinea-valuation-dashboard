@@ -28,10 +28,10 @@ with projeto_tab:
     col_projeto, col_clona_versao = st.columns(2)
 
     option_proj = col_projeto.selectbox("Projeto:", df_projeto["Name"])
-    selected_id = df_projeto.loc[df_projeto["Name"] == option_proj, "Id"].iloc[0]
-    df_projeto = df_projeto[df_projeto["Id"] == selected_id].reset_index(drop=True)
+    id_projeto = df_projeto.loc[df_projeto["Name"] == option_proj, "Id"].iloc[0]
+    df_projeto = df_projeto[df_projeto["Id"] == id_projeto].reset_index(drop=True)
 
-    df_premissa_sql = fluxo.v.sql.select_premissa()
+    df_premissa_sql = fluxo.v.sql.select_premissa(id_projeto=id_projeto)
     option_versao = col_clona_versao.selectbox(
         "Clonar de:", df_premissa_sql["chave_premissa"]
     )
@@ -218,7 +218,7 @@ with velocidade_vendas_tab:
                 )
         bt_curva_vendas = st.button("Visualizar Curva")
         if bt_curva_vendas:
-            df = fluxo.v.base_proj_vendas(data_premissa, selected_id)
+            df = fluxo.v.base_proj_vendas(data_premissa, id_projeto)
             (
                 status_projeto,
                 data_termino_status,
@@ -386,8 +386,8 @@ if st.button("Calcular"):
     # fluxo.fluxo_proj_vendas(df_projeto, data_premissa, data_lancamento, data_ini_obra, data_entrega, data_termino, venda_perc_comissao, venda_preco_m2_bruto, data_base_reajuste, hip_vendas_lancamento, hip_vendas_periodo_obra, hip_vendas_poschave, pos_ch_periodo_recebimento)
     # fluxo.fluxo_tot_recebiveis(con_sf=sf_con, id_projeto=selected_id, data_ref=data_premissa, meses_inad=inad_curva_projetada, pdd=inad_pdd)
 
-    print("selected_id", selected_id)
-    df = fluxo.v.base_proj_vendas(data_premissa, selected_id)
+    print("selected_id", id_projeto)
+    df = fluxo.v.base_proj_vendas(data_premissa, id_projeto)
     percent = i + 1
     my_bar.progress((percent / total), text=progress_text)
 
@@ -448,7 +448,7 @@ if st.button("Calcular"):
         indexador=df_projeto["Indexador"][0],
         taxa_spread=df_projeto["Spread"][0],
         df_proj_vendas=df_curva,
-        id_projeto=selected_id,
+        id_projeto=id_projeto,
         data_ref=data_premissa,
         meses_inad=inad_curva_projetada,
         pdd=inad_pdd,

@@ -1,3 +1,5 @@
+from typing import Optional
+
 import pandas as pd
 from sqlalchemy import Connection, TextClause, create_engine, sql
 
@@ -37,13 +39,13 @@ def select_db_sell(data_ref, id_projeto):
 
 def select_db_status_unidades(data_ref, id_projeto):
     connection = conexao_BD()
+
     script_sql = sql.text(
         f"""
         select u.Id_Projeto, u.Area, s.* 
         from Incorporacao_Status_Unidades s
         inner join Incorporacao_Unidades u on (u.Id_Unidade = s.Id_Unidade)
         where u.Id_Projeto = '{id_projeto}'
-        and LEFT(Mes_Referencia,7) = '{data_ref.strftime("%Y-%m")}'
         """,
     )
     df = _select_sql(connection, script_sql)
@@ -69,12 +71,11 @@ def select_indices(data_base_reajuste, data_ref):
     return df
 
 
-def select_premissa():
+def select_premissa(id_projeto: Optional[str] = None):
     connection = conexao_BD()
     script_sql = sql.text(
-        f"""
-        select * from incorp_val_premissa
-        """
+        f"select * from incorp_val_premissa"
+        + (f" where id_projeto = '{id_projeto}'" if id_projeto else "")
     )
     df = _select_sql(connection, script_sql)
     print(df)
