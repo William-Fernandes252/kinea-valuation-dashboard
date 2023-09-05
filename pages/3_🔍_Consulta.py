@@ -1,3 +1,5 @@
+from io import BytesIO
+
 import streamlit as st
 
 from pages.components import projeto_form
@@ -43,12 +45,12 @@ if get_mostrar_comandos():
 
     st.markdown("### Downloads")
 
-    column1, column2, column3, column4 = st.columns([1, 1, 1, 1])
+    column1, column2, column3, column4 = st.columns(4, gap="small")
     with column1:
-        st.download_button("Base de vendas", type="primary")
+        st.download_button("Base de vendas", type="primary", data=BytesIO(b"K"))
     with column2:
-        st.download_button("Fluxo", type="primary")
+        st.download_button("Fluxo", type="primary", data=BytesIO(b"I"))
     with column3:
-        st.download_button("Curva", type="primary")
+        st.download_button("Curva", type="primary", data=BytesIO(b"N"))
     with column4:
-        st.download_button("Curva CRI", type="primary")
+        st.download_button("Curva CRI", type="primary", data=BytesIO(b"EA"))
