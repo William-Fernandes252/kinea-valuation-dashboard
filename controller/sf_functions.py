@@ -49,10 +49,9 @@ def SFToDF_projeto():
     return df
 
 
-def SF_select_serieCri(sf, id_projeto):
+def SF_select_serieCri(id_projeto):
     script = text(
-        r"SELECT Id, Name, Codigo_Fundo__c, Aniversario_CRI__c FROM Serie_CRI__c where Projeto_Real_Estate__c = :idprojeto",
-        {"idprojeto": id_projeto},
+        f"SELECT Id, Name, Codigo_Fundo__c, Aniversario_CRI__c FROM Serie_CRI__c where Projeto_Real_Estate__c = '{id_projeto}'",
     )
     result = sql_functions.conexao_BD().execute(script).fetchall()
     df = pd.DataFrame(result, index=None)

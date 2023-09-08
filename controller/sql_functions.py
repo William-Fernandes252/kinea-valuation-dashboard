@@ -29,8 +29,6 @@ def select_db_sell(data_ref, id_projeto):
         inner join re_incorporacao_contratos c on (c.Id_Unidade = u.Id_Unidade)
         inner join re_incorporacao_contratos_parcelas p on (p.Id_Contrato = c.Id_Contrato)
         inner join re_incorporacao_fluxos_recebiveis f on (f.Id_Parcela = p.Id_Parcela)
-        where LEFT(Data_Referencia,7) = '{data_ref.strftime("%Y-%m")}'
-        and Id_Projeto = '{id_projeto}'
         """,
     )
     df = _select_sql(connection, script_sql)
@@ -42,7 +40,7 @@ def select_db_status_unidades(data_ref, id_projeto):
 
     script_sql = sql.text(
         f"""
-        select u.Id_Projeto, u.Area, s.* 
+        select u.Id_Projeto as Id_Projeto, u.Area as Area, s.Status as Status, u.Id_Unidade as Id_Unidade
         from Incorporacao_Status_Unidades s
         inner join Incorporacao_Unidades u on (u.Id_Unidade = s.Id_Unidade)
         where u.Id_Projeto = '{id_projeto}'
@@ -53,19 +51,14 @@ def select_db_status_unidades(data_ref, id_projeto):
 
 
 def select_indices(data_base_reajuste, data_ref):
-    print("Consultando indices no SQL...\n")
     connection = conexao_BD()
     script_sql = sql.text(
         f"""
         select * from BD_RENDA_INDICES 
         where Codigo in ('IPCA', 'CDI')
-        and Data >= :dataBaseReajuste
-        and Data <= :dataRef
+        and Data >= '{data_base_reajuste.strftime("%Y-%m-%d")}'
+        and Data <= '{data_ref.strftime("%Y-%m-%d")}'
         """,
-        {
-            "dataBaseReajuste": data_base_reajuste.strftime("%Y-%m"),
-            "dataRef": data_ref.strftime("%Y-%m"),
-        },
     )
     df = _select_sql(connection, script_sql)
     return df
@@ -78,7 +71,6 @@ def select_premissa(id_projeto: Optional[str] = None):
         + (f" where id_projeto = '{id_projeto}'" if id_projeto else "")
     )
     df = _select_sql(connection, script_sql)
-    print(df)
     df["chave_premissa"] = df.apply(
         lambda x: str(x["versao"]) + " - " + str(x["id_premissa"]),
         axis=1,
@@ -90,9 +82,8 @@ def select_juros_amortizacao(codigo, cod_oper):
     connection = conexao_BD()
     script_sql = sql.text(
         f"""
-        select * from Bd_Middle_FundosCaixa where CodOper = :codOper and Codigo = :codigo
+        select * from Bd_Middle_FundosCaixa where CodOper = '{cod_oper}' and Codigo = '{codigo}'
         """,
-        {"codOper": cod_oper, "codigo": codigo},
     )
     df = _select_sql(connection, script_sql)
     return df
