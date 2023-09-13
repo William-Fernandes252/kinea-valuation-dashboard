@@ -470,4 +470,5 @@ if st.button("Calcular"):
     sleep(1)
 
     my_bar.empty()
-    st.success("Premissa salva com sucesso!")
+    success_notification = st.success("Premissa salva com sucesso!")
+    set_timeout(2, lambda: success_notification.empty())
