@@ -1,4 +1,4 @@
-from typing import Self
+from __future__ import annotations
 
 from streamlit.delta_generator import DeltaGenerator
 
@@ -13,7 +13,7 @@ class ProjetoForm(Form):
     projeto: str
 
     @classmethod
-    def render(cls, root: DeltaGenerator) -> Self:
+    def render(cls, root: DeltaGenerator) -> "ProjetoForm":
         def validar_projeto_form(
             *, tipo_projeto, incorporadora, fundo, projeto
         ) -> str | None:

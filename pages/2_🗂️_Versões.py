@@ -1,3 +1,5 @@
+from typing import List, Optional
+
 import streamlit as st
 
 from controller import sql_functions, versoes
@@ -55,8 +57,8 @@ if get_mostrar_resultados():
         versoes_config_form = configuracao_aside.form("version-config-form")
 
         def validate_versoes(
-            *, versoes: list[dict], indicadores: list[str]
-        ) -> str | None:
+            *, versoes: List[dict], indicadores: List[str]
+        ) -> Optional[str]:
             if len(versoes) < 1:
                 return "Selecione pelo menos uma versão para analisar."
             if "Todos" in indicadores and len(indicadores) > 1:

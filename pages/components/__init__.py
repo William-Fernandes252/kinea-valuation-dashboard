@@ -1,7 +1,6 @@
 from abc import ABC, abstractclassmethod
-from collections.abc import Sequence
 from functools import partial
-from typing import Any, AnyStr, ClassVar, Optional, Protocol, Self
+from typing import Any, AnyStr, ClassVar, List, Optional, Protocol
 
 from attrs import field, frozen, validators
 from streamlit.delta_generator import DeltaGenerator
@@ -24,7 +23,7 @@ class Component(ABC):
     )
 
     @abstractclassmethod
-    def render(cls, root: DeltaGenerator) -> Self:
+    def render(cls, root: DeltaGenerator) -> "Component":
         ...
 
 
@@ -35,5 +34,5 @@ class Form(Component, ABC):
     validator: Optional[Validator] = field(default=None)
 
     @classmethod
-    def get_nullable_options(cls, options: Sequence[Any]) -> Sequence[Any]:
+    def get_nullable_options(cls, options: List[Any]) -> List[Any]:
         return [cls.NULL_OPTION] + [*options]
